@@ -31,7 +31,7 @@ export function MangaCardModern({
   return (
     <div className="group relative rounded-xl overflow-hidden bg-[#1E1E2E] border border-[#2A2A3E] hover:border-[#FF4500]/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
       {/* Cover Image */}
-      <Link href={isFromMangaDex ? `/manga/${id}` : '#'} className="block">
+      <Link href={isFromMangaDex ? `/manga/?id=${id}` : '#'} className="block">
         <div className="relative aspect-[3/4] overflow-hidden bg-[#252535]">
           {coverUrl ? (
             <img
@@ -52,7 +52,7 @@ export function MangaCardModern({
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3 gap-2">
             {isFromMangaDex && (
               <Link
-                href={`/manga/${id}`}
+                href={`/manga/?id=${id}`}
                 className="w-full py-2 text-center text-xs font-bold bg-[#FF4500] text-white rounded-lg hover:bg-[#e03d00] transition-colors"
                 onClick={(e) => e.stopPropagation()}
               >
@@ -95,7 +95,7 @@ export function MangaCardModern({
 
       {/* Card Info */}
       <div className="p-3">
-        <Link href={isFromMangaDex ? `/manga/${id}` : '#'}>
+        <Link href={isFromMangaDex ? `/manga/?id=${id}` : '#'}>
           <h3 className="text-sm font-semibold text-white line-clamp-2 leading-tight hover:text-[#FF4500] transition-colors">
             {title}
           </h3>

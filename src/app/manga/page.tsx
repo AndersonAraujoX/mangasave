@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import React, { useEffect, useState, Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { getMangaDetails, MangaDetails } from '../../../services/mangadex';
-import { getMangaChapters, Chapter } from '../../../services/reader';
-import { saveManga, getSavedMangas, removeManga, SavedManga, getDeviceId } from '../../../services/storage';
-import { Navbar } from '../../../components/Navbar';
+import { getMangaDetails, MangaDetails } from '../../services/mangadex';
+import { getMangaChapters, Chapter } from '../../services/reader';
+import { saveManga, getSavedMangas, removeManga, SavedManga, getDeviceId } from '../../services/storage';
+import { Navbar } from '../../components/Navbar';
 
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
   ongoing: { label: 'Em Lançamento', color: 'bg-green-500/20 text-green-400 border-green-500/30' },
@@ -15,10 +15,10 @@ const STATUS_MAP: Record<string, { label: string; color: string }> = {
   cancelled: { label: 'Cancelado', color: 'bg-red-500/20 text-red-400 border-red-500/30' },
 };
 
-export default function MangaDetailsPage() {
-  const params = useParams();
+function MangaDetailsContent() {
+  const searchParams = useSearchParams();
   const router = useRouter();
-  const mangaId = params?.id as string;
+  const mangaId = searchParams?.get('id') || '';
 
   const [details, setDetails] = useState<MangaDetails | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
@@ -56,6 +56,14 @@ export default function MangaDetailsPage() {
   }
 
   const filtered = langFilter === 'all' ? chapters : chapters.filter((c) => c.language === langFilter);
+
+  if (!mangaId) {
+    return (
+      <div className="min-h-screen bg-[#121212] flex items-center justify-center">
+        <p className="text-[#A0A0B0]">ID do mangá não informado.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#121212]">
@@ -132,7 +140,7 @@ export default function MangaDetailsPage() {
                 <div className="flex flex-wrap gap-3 pt-2">
                   {chapters.length > 0 && (
                     <Link
-                      href={`/manga/${mangaId}/chapter/${chapters[chapters.length - 1].id}`}
+                      href={`/reader/?id=${mangaId}&chapterId=${chapters[chapters.length - 1].id}`}
                       className="px-6 py-2.5 bg-[#FF4500] text-white text-sm font-bold rounded-xl hover:bg-[#e03d00] transition-colors shadow-[0_0_20px_rgba(255,69,0,0.3)]"
                     >
                       ▶ Começar Leitura
@@ -195,7 +203,7 @@ export default function MangaDetailsPage() {
               {filtered.map((chap) => (
                 <Link
                   key={chap.id}
-                  href={`/manga/${mangaId}/chapter/${chap.id}`}
+                  href={`/reader/?id=${mangaId}&chapterId=${chap.id}`}
                   className="flex items-center justify-between p-4 bg-[#1E1E2E] border border-[#2A2A3E] rounded-xl hover:border-[#FF4500]/50 hover:bg-[#252535] transition-all group"
                 >
                   <div className="flex items-center gap-4">
@@ -233,7 +241,7 @@ export default function MangaDetailsPage() {
               </div>
               <div className="flex items-center gap-3 w-full sm:w-auto">
                 <Link
-                  href={`/manga/${mangaId}/chapter/${chapters.find(c => c.chapterNumber === savedInfo.currentChapter)?.id || chapters[0].id}${savedInfo.currentPage !== undefined ? `?page=${savedInfo.currentPage}` : ''}`}
+                  href={`/reader/?id=${mangaId}&chapterId=${chapters.find(c => c.chapterNumber === savedInfo.currentChapter)?.id || chapters[0].id}${savedInfo.currentPage !== undefined ? `&page=${savedInfo.currentPage}` : ''}`}
                   className="flex-1 sm:flex-none px-4 py-2 bg-[#FF4500] text-white text-sm font-bold rounded-xl hover:bg-[#e03d00] transition-colors text-center"
                 >
                   Continuar
@@ -253,5 +261,13 @@ export default function MangaDetailsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function MangaDetailsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#121212]" />}>
+      <MangaDetailsContent />
+    </Suspense>
   );
 }

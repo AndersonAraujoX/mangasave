@@ -23,7 +23,7 @@ export const MangaCard: React.FC<MangaCardProps> = ({
 }) => {
   return (
     <div className={styles.card} data-testid={`manga-card-${id}`}>
-      <Link href={`/manga/${id}`} className={styles.imageContainer}>
+      <Link href={`/manga/?id=${id}`} className={styles.imageContainer}>
         {coverUrl ? (
           <img src={coverUrl} alt={title} className={styles.image} loading="lazy" />
         ) : (
@@ -31,7 +31,7 @@ export const MangaCard: React.FC<MangaCardProps> = ({
         )}
       </Link>
       <div className={styles.content}>
-        <Link href={`/manga/${id}`} style={{ textDecoration: 'none' }}>
+        <Link href={`/manga/?id=${id}`} style={{ textDecoration: 'none' }}>
           <h3 className={styles.title} title={title}>{title}</h3>
         </Link>
         <div className={styles.chapter}>

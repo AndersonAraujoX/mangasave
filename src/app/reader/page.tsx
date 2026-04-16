@@ -1,20 +1,19 @@
 'use client';
 
-import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import React, { useEffect, useState, useCallback, useRef, Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { getChapterImages } from '../../../../../services/reader';
-import { getMangaChapters, Chapter } from '../../../../../services/reader';
-import { saveManga, getSavedMangas, updateReadingProgress } from '../../../../../services/storage';
+import { getChapterImages } from '../../services/reader';
+import { getMangaChapters, Chapter } from '../../services/reader';
+import { getSavedMangas, updateReadingProgress } from '../../services/storage';
 
 type ReadMode = 'scroll' | 'page';
 
-export default function ChapterReaderPage() {
-  const params = useParams();
+function ChapterReaderContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const mangaId = params?.id as string;
-  const chapterId = params?.chapterId as string;
+  const mangaId = searchParams?.get('id') || '';
+  const chapterId = searchParams?.get('chapterId') || '';
   const initialPage = parseInt(searchParams?.get('page') || '0', 10);
 
   const [images, setImages] = useState<string[]>([]);
@@ -45,7 +44,7 @@ export default function ChapterReaderPage() {
     const saved = getSavedMangas().find((m) => m.id === mangaId);
     if (saved) {
       const currentChap = chapters.find((c) => c.id === chapterId);
-      if (currentChap) { // Force mobile mock if 'mock=mobile' is in URL for testing
+      if (currentChap) {
         const forceMock = searchParams?.get('mock') === 'mobile';
         updateReadingProgress(mangaId, currentChap.chapterNumber, currentPage, forceMock);
       }
@@ -83,6 +82,14 @@ export default function ChapterReaderPage() {
   function nextPage() { setCurrentPage((p) => Math.min(p + 1, images.length - 1)); }
   function prevPage() { setCurrentPage((p) => Math.max(p - 1, 0)); }
 
+  if (!mangaId || !chapterId) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <p className="text-white/50">Parâmetros inválidos.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-black text-white" ref={containerRef}>
       {/* Header - slides in/out */}
@@ -91,7 +98,7 @@ export default function ChapterReaderPage() {
           <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
             {/* Back + Title */}
             <div className="flex items-center gap-3 min-w-0">
-              <Link href={`/manga/${mangaId}`} className="shrink-0 w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center hover:bg-white/20 transition">
+              <Link href={`/manga/?id=${mangaId}`} className="shrink-0 w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center hover:bg-white/20 transition">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
@@ -133,7 +140,7 @@ export default function ChapterReaderPage() {
                     {chapters.map((c) => (
                       <Link
                         key={c.id}
-                        href={`/manga/${mangaId}/chapter/${c.id}`}
+                        href={`/reader/?id=${mangaId}&chapterId=${c.id}`}
                         onClick={() => setShowChapterSelector(false)}
                         className={`flex items-center justify-between px-4 py-3 text-xs hover:bg-white/10 transition ${c.id === chapterId ? 'bg-[#FF4500]/20 text-[#FF4500]' : 'text-white/70'}`}
                       >
@@ -176,12 +183,12 @@ export default function ChapterReaderPage() {
             <p className="text-white/50 text-sm">Fim do capítulo</p>
             <div className="flex items-center gap-4">
               {prevChapter && (
-                <Link href={`/manga/${mangaId}/chapter/${prevChapter.id}`} className="px-5 py-2.5 bg-[#1E1E2E] border border-[#2A2A3E] text-white text-sm font-bold rounded-xl hover:border-[#FF4500] transition">
+                <Link href={`/reader/?id=${mangaId}&chapterId=${prevChapter.id}`} className="px-5 py-2.5 bg-[#1E1E2E] border border-[#2A2A3E] text-white text-sm font-bold rounded-xl hover:border-[#FF4500] transition">
                   ← Cap. {prevChapter.chapterNumber}
                 </Link>
               )}
               {nextChapter && (
-                <Link href={`/manga/${mangaId}/chapter/${nextChapter.id}`} className="px-5 py-2.5 bg-[#FF4500] text-white text-sm font-bold rounded-xl hover:bg-[#e03d00] transition">
+                <Link href={`/reader/?id=${mangaId}&chapterId=${nextChapter.id}`} className="px-5 py-2.5 bg-[#FF4500] text-white text-sm font-bold rounded-xl hover:bg-[#e03d00] transition">
                   Cap. {nextChapter.chapterNumber} →
                 </Link>
               )}
@@ -230,5 +237,13 @@ export default function ChapterReaderPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ReaderPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-black" />}>
+      <ChapterReaderContent />
+    </Suspense>
   );
 }

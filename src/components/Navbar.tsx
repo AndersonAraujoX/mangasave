@@ -36,7 +36,7 @@ export function Navbar() {
     setShowSuggestions(false);
     setQuery('');
     if (manga.provider === 'mangadex') {
-      router.push(`/manga/${manga.id}`);
+      router.push(`/manga/?id=${manga.id}`);
     }
   }
 

@@ -64,13 +64,13 @@ export function HeroCarousel({ items }: HeroCarouselProps) {
             <h2 className="text-white text-3xl sm:text-4xl font-black leading-tight line-clamp-2">{manga.title}</h2>
             <div className="flex items-center gap-3">
               <Link
-                href={`/manga/${manga.id}`}
+                href={`/manga/?id=${manga.id}`}
                 className="px-6 py-2.5 bg-[#FF4500] text-white text-sm font-bold rounded-xl hover:bg-[#e03d00] transition-colors shadow-[0_0_20px_rgba(255,69,0,0.4)]"
               >
                 Ler Agora
               </Link>
               <Link
-                href={`/manga/${manga.id}`}
+                href={`/manga/?id=${manga.id}`}
                 className="px-6 py-2.5 bg-white/10 backdrop-blur text-white text-sm font-bold rounded-xl hover:bg-white/20 transition-colors border border-white/20"
               >
                 Detalhes
