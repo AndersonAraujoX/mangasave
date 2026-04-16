@@ -1,3 +1,4 @@
+import { proxiedFetch } from "./fetchProxy";
 import { MangaResult } from './types';
 
 const BASE_URL = 'https://api.mangadex.org';
@@ -13,7 +14,7 @@ export interface MangaDetails {
 }
 
 export const searchManga = async (query: string): Promise<MangaResult[]> => {
-  const response = await fetch(`${BASE_URL}/manga?title=${encodeURIComponent(query)}&includes[]=cover_art&limit=10`);
+  const response = await proxiedFetch(`${BASE_URL}/manga?title=${encodeURIComponent(query)}&includes[]=cover_art&limit=10`);
   if (!response.ok) {
     throw new Error('Failed to fetch from MangaDex');
   }
@@ -35,7 +36,7 @@ export const searchManga = async (query: string): Promise<MangaResult[]> => {
 };
 
 export const getLatestChapter = async (mangaId: string): Promise<string | null> => {
-  const response = await fetch(`${BASE_URL}/manga/${mangaId}/feed?translatedLanguage[]=pt-br&translatedLanguage[]=en&order[chapter]=desc&limit=1`);
+  const response = await proxiedFetch(`${BASE_URL}/manga/${mangaId}/feed?translatedLanguage[]=pt-br&translatedLanguage[]=en&order[chapter]=desc&limit=1`);
   if (!response.ok) {
     throw new Error('Failed to fetch chapters');
   }
@@ -48,7 +49,7 @@ export const getLatestChapter = async (mangaId: string): Promise<string | null> 
 
 export const getPopularManga = async (): Promise<MangaResult[]> => {
   try {
-    const response = await fetch(
+    const response = await proxiedFetch(
       `${BASE_URL}/manga?order[followedCount]=desc&includes[]=cover_art&limit=10&availableTranslatedLanguage[]=pt-br&availableTranslatedLanguage[]=en`
     );
     if (!response.ok) return [];
@@ -69,7 +70,7 @@ export const getPopularManga = async (): Promise<MangaResult[]> => {
 
 export const getRecentlyUpdated = async (): Promise<MangaResult[]> => {
   try {
-    const response = await fetch(
+    const response = await proxiedFetch(
       `${BASE_URL}/manga?order[updatedAt]=desc&includes[]=cover_art&limit=18&availableTranslatedLanguage[]=pt-br&availableTranslatedLanguage[]=en`
     );
     if (!response.ok) return [];
@@ -100,7 +101,7 @@ export interface MangaDetails {
 
 export const getMangaDetails = async (mangaId: string): Promise<MangaDetails | null> => {
   try {
-    const response = await fetch(`${BASE_URL}/manga/${mangaId}?includes[]=cover_art`);
+    const response = await proxiedFetch(`${BASE_URL}/manga/${mangaId}?includes[]=cover_art`);
     if (!response.ok) return null;
     const data = await response.json();
     const manga = data.data;

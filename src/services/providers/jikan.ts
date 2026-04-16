@@ -1,8 +1,9 @@
+import { proxiedFetch } from "../fetchProxy";
 import { MangaResult } from '../types';
 
 export const searchJikan = async (query: string): Promise<MangaResult[]> => {
   try {
-    const response = await fetch(`https://api.jikan.moe/v4/manga?q=${encodeURIComponent(query)}&limit=10`);
+    const response = await proxiedFetch(`https://api.jikan.moe/v4/manga?q=${encodeURIComponent(query)}&limit=10`);
     if (!response.ok) return [];
     
     const data = await response.json();

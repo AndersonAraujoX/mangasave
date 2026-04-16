@@ -1,8 +1,9 @@
+import { proxiedFetch } from "../fetchProxy";
 import { MangaResult } from '../types';
 
 export const searchMangaUpdates = async (query: string): Promise<MangaResult[]> => {
   try {
-    const response = await fetch('https://api.mangaupdates.com/v1/series/search', {
+    const response = await proxiedFetch('https://api.mangaupdates.com/v1/series/search', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

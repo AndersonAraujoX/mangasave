@@ -1,8 +1,9 @@
+import { proxiedFetch } from "../fetchProxy";
 import { MangaResult } from '../types';
 
 export const searchKitsu = async (query: string): Promise<MangaResult[]> => {
   try {
-    const response = await fetch(`https://kitsu.io/api/edge/manga?filter[text]=${encodeURIComponent(query)}&page[limit]=10`);
+    const response = await proxiedFetch(`https://kitsu.io/api/edge/manga?filter[text]=${encodeURIComponent(query)}&page[limit]=10`);
     if (!response.ok) return [];
     
     const data = await response.json();

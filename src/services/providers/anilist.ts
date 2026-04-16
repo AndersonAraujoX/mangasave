@@ -1,3 +1,4 @@
+import { proxiedFetch } from "../fetchProxy";
 import { MangaResult } from '../types';
 
 export const searchAniList = async (query: string): Promise<MangaResult[]> => {
@@ -20,7 +21,7 @@ export const searchAniList = async (query: string): Promise<MangaResult[]> => {
   `;
 
   try {
-    const response = await fetch('https://graphql.anilist.co', {
+    const response = await proxiedFetch('https://graphql.anilist.co', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

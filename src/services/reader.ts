@@ -1,3 +1,4 @@
+import { proxiedFetch } from "./fetchProxy";
 const BASE_URL = 'https://api.mangadex.org';
 
 export interface Chapter {
@@ -10,7 +11,7 @@ export interface Chapter {
 
 export const getMangaChapters = async (mangaId: string): Promise<Chapter[]> => {
   try {
-    const response = await fetch(`${BASE_URL}/manga/${mangaId}/feed?translatedLanguage[]=pt-br&translatedLanguage[]=en&order[chapter]=desc&limit=100`);
+    const response = await proxiedFetch(`${BASE_URL}/manga/${mangaId}/feed?translatedLanguage[]=pt-br&translatedLanguage[]=en&order[chapter]=desc&limit=100`);
     if (!response.ok) throw new Error('Failed to fetch feed');
     
     const data = await response.json();
@@ -29,7 +30,7 @@ export const getMangaChapters = async (mangaId: string): Promise<Chapter[]> => {
 
 export const getChapterImages = async (chapterId: string): Promise<string[]> => {
   try {
-    const response = await fetch(`${BASE_URL}/at-home/server/${chapterId}`);
+    const response = await proxiedFetch(`${BASE_URL}/at-home/server/${chapterId}`);
     if (!response.ok) throw new Error('Failed to fetch chapter images server');
 
     const data = await response.json();
