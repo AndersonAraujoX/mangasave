@@ -157,7 +157,7 @@ function ChapterReaderContent() {
       </div>
 
       {/* Loading */}
-      {isLoading && (
+      {isLoading && !currentChapterInfo?.externalUrl && (
         <div className="flex items-center justify-center h-screen">
           <div className="text-center space-y-4">
             <div className="w-12 h-12 border-2 border-[#FF4500] border-t-transparent rounded-full animate-spin mx-auto" />
@@ -166,18 +166,53 @@ function ChapterReaderContent() {
         </div>
       )}
 
+      {/* Official External Content */}
+      {!isLoading && currentChapterInfo?.externalUrl && (
+        <div className="pt-24 sm:pt-32 flex flex-col items-center justify-center p-4">
+           <div className="max-w-md w-full text-center bg-[#1E1E2E] border border-[#2A2A3E] rounded-2xl p-8 shadow-2xl">
+              <svg className="w-16 h-16 text-[#FF4500] mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+              <h2 className="text-2xl font-black text-white mb-2">Capítulo Oficial</h2>
+              <p className="text-[#A0A0B0] text-sm mb-8 leading-relaxed">
+                Este capítulo não possui imagens gratuitas na nossa database pois é licenciado oficialmente pela editora na sua região (Mangaplus, etc).
+              </p>
+              <a href={currentChapterInfo.externalUrl} target="_blank" rel="noopener noreferrer" className="block w-full px-6 py-4 bg-[#FF4500] text-white font-bold rounded-xl hover:bg-[#e03d00] transition-colors shadow-[0_0_20px_rgba(255,69,0,0.3)]">
+                Ler Origem (<span className="uppercase">{currentChapterInfo.language}</span>)
+              </a>
+           </div>
+
+           <div className="py-12 text-center space-y-4 mt-8">
+             <div className="flex items-center gap-4 justify-center">
+               {prevChapter && (
+                 <Link href={`/reader/?id=${mangaId}&chapterId=${prevChapter.id}`} className="px-5 py-2.5 bg-[#1E1E2E] border border-[#2A2A3E] text-white text-sm font-bold rounded-xl hover:border-[#FF4500] transition">
+                   ← Cap. {prevChapter.chapterNumber}
+                 </Link>
+               )}
+               {nextChapter && (
+                 <Link href={`/reader/?id=${mangaId}&chapterId=${nextChapter.id}`} className="px-5 py-2.5 bg-[#FF4500] text-white text-sm font-bold rounded-xl hover:bg-[#e03d00] transition">
+                   Cap. {nextChapter.chapterNumber} →
+                 </Link>
+               )}
+             </div>
+           </div>
+        </div>
+      )}
+
       {/* Webtoon Scroll Mode */}
-      {!isLoading && readMode === 'scroll' && (
+      {!isLoading && !currentChapterInfo?.externalUrl && readMode === 'scroll' && (
         <div className="pt-16 flex flex-col items-center">
-          {images.map((src, idx) => (
-            <img
-              key={idx}
-              src={src}
-              alt={`Página ${idx + 1}`}
-              className="w-full max-w-3xl block"
-              loading="lazy"
-            />
-          ))}
+          {images.length === 0 ? (
+            <div className="pt-20 text-white/50 text-center">Nenhuma página encontrada para este capítulo.</div>
+          ) : (
+            images.map((src, idx) => (
+              <img
+                key={idx}
+                src={src}
+                alt={`Página ${idx + 1}`}
+                className="w-full max-w-3xl block"
+                loading="lazy"
+              />
+            ))
+          )}
           {/* End of Chapter Nav */}
           <div className="py-12 text-center space-y-4">
             <p className="text-white/50 text-sm">Fim do capítulo</p>
@@ -198,7 +233,7 @@ function ChapterReaderContent() {
       )}
 
       {/* Page Mode */}
-      {!isLoading && readMode === 'page' && images.length > 0 && (
+      {!isLoading && !currentChapterInfo?.externalUrl && readMode === 'page' && images.length > 0 && (
         <div className="fixed inset-0 flex flex-col bg-black">
           {/* Spacer for header */}
           <div className="h-16" />

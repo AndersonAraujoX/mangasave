@@ -7,6 +7,7 @@ export interface Chapter {
   title: string;
   language: string;
   pages: number;
+  externalUrl?: string | null;
 }
 
 export const getMangaChapters = async (mangaId: string): Promise<Chapter[]> => {
@@ -20,7 +21,8 @@ export const getMangaChapters = async (mangaId: string): Promise<Chapter[]> => {
       chapterNumber: chap.attributes.chapter || '0',
       title: chap.attributes.title || `Capítulo ${chap.attributes.chapter}`,
       language: chap.attributes.translatedLanguage,
-      pages: chap.attributes.pages
+      pages: chap.attributes.pages,
+      externalUrl: chap.attributes.externalUrl
     }));
   } catch (error) {
     console.error('getMangaChapters Error:', error);
